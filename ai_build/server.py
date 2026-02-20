@@ -33,6 +33,21 @@ from ai_build.local_patcher import _sanitize_diff
 
 app = Flask(__name__)
 
+
+def _project_context_text(root: str, max_chars: int = 8_000) -> str:
+    """Build a compact project context string for passing to the Reviewer agent.
+
+    Calls context_engine (arch detection, key files, plan status) and renders
+    it as a text block.  Capped at max_chars to stay within the reviewer's
+    token budget.  Returns empty string on any error so reviews still work
+    even if context_engine fails.
+    """
+    try:
+        from ai_build.context_engine import build_context, context_to_text
+        return context_to_text(build_context(root), max_chars=max_chars)
+    except Exception:
+        return ""
+
 # ---------------------------------------------------------------------------
 # In-memory session state (single-user local tool)
 # ---------------------------------------------------------------------------
@@ -458,7 +473,8 @@ def patch_local():
                 return
             _state["diffs"][sid] = diff
             save_patch(sid, diff)
-            rev = review_patch(diff, step["description"], model=_state.get("reviewer_model"))
+            _proj_ctx = _project_context_text(_state.get("project_root", "."))
+            rev = review_patch(diff, step["description"], context=_proj_ctx, model=_state.get("reviewer_model"))
             _state["reviews"][sid] = rev
             _flash(f"✓ Patch generated and reviewed for step {sid}.")
         except Exception as exc:
@@ -489,7 +505,8 @@ def review_patch_route():
     _state["diffs"][sid] = patch
     save_patch(sid, patch)
     _flash("Sending diff to Ollama for review…")
-    review = review_patch(patch, step["description"], model=_state.get("reviewer_model"))
+    _proj_ctx = _project_context_text(_state.get("project_root", "."))
+    review = review_patch(patch, step["description"], context=_proj_ctx, model=_state.get("reviewer_model"))
     _state["reviews"][sid] = review
     _flash("Review complete — choose Approve, Skip, or Retry.")
     return redirect(url_for("index"))
@@ -657,6 +674,8 @@ def run_all():
         try:
             from ai_build.local_patcher import generate_patch_local
             root = _state.get("project_root", ".")
+            # Build rich project context once — reused for every step's review
+            _proj_ctx = _project_context_text(root)
             n = len(pending)
             approved_count = 0
             for i, step in enumerate(pending, 1):
@@ -681,7 +700,7 @@ def run_all():
                 _state["diffs"][sid] = diff
                 save_patch(sid, diff)
                 _state["bg_label"] = f"Step {i}/{n} — Reviewing: {step['title'][:40]}…"
-                rev = review_patch(diff, step["description"], model=_state.get("reviewer_model"))
+                rev = review_patch(diff, step["description"], context=_proj_ctx, model=_state.get("reviewer_model"))
                 _state["reviews"][sid] = rev
                 update_step_status(sid, "approved")
                 _state["active_step_id"] = sid

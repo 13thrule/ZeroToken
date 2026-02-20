@@ -1,4 +1,10 @@
-﻿# ZeroToken
+# ZeroToken
+
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Ollama required](https://img.shields.io/badge/Ollama-required-orange)](https://ollama.com)
+[![No API keys](https://img.shields.io/badge/API%20keys-none%20required-brightgreen)](#)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Mac%20%7C%20Linux-lightgrey)](#)
 
 > A local AI coding assistant that uses **Ollama** to plan and draft code changes, then hands off to **Claude** to apply them.
 > No API keys required. No data leaves your machine automatically.
@@ -18,8 +24,7 @@ You stay in control at every step. Nothing is applied automatically; you review 
 
 ---
 
-<!-- Screenshot: drop a PNG of the app here
-     e.g.: ![ZeroToken UI](docs/screenshot.png) -->
+![ZeroToken start screen](screenshots/start%20screen.png)
 
 ---
 
@@ -59,6 +64,18 @@ DELIVER
 
 ---
 
+## Screenshots
+
+**Step view  review, approve, or refine each patch before it goes anywhere:**
+
+![Approve or refine prompt](screenshots/approve%20or%20refine%20prompt.png)
+
+**Final prompt  one assembled block ready to paste into Claude:**
+
+![Final prompt output](screenshots/final%20prompt%20output.png)
+
+---
+
 ## Prerequisites
 
 | Requirement | Version | Notes |
@@ -92,7 +109,7 @@ pip install -r requirements.txt
 # 4. Copy the environment template (optional  only needed to override defaults)
 copy .env.example .env        # Windows
 cp .env.example .env          # Mac/Linux
-# Edit .env and set OLLAMA_MODEL if you want a different model
+# Edit .env and set OLLAMA_MODEL if you want a different default model
 ```
 
 ---
@@ -129,13 +146,13 @@ Then open **http://127.0.0.1:5000** in your browser.
 
 ## Changing the Ollama model
 
-Set `OLLAMA_MODEL` in your `.env` file, or use the **Models** panel in the sidebar of the web UI to pick a different model for each agent independently:
+Set `OLLAMA_MODEL` in your `.env` file, or use the **Models** panel in the sidebar to pick a different model for each agent independently:
 
 ```env
 OLLAMA_MODEL=gemma3:12b
 ```
 
-The sidebar Models section dynamically lists every model you have pulled in Ollama, with a separate dropdown for Planner, Patcher, Reviewer, and Refiner.
+The sidebar Models section dynamically lists every model you have pulled in Ollama, with a separate dropdown for Planner, Patcher, Reviewer, and Refiner  plus a **Context tokens** field to increase the Ollama context window (`num_ctx`) without restarting anything.
 
 ---
 
@@ -197,6 +214,7 @@ ZeroToken/
     +-- assembler.py       Combines approved diffs into Final Agent Prompt
     +-- storage.py         Reads/writes plan.json, patches, prompts
     +-- context.py         Tech stack detection and file tree builder
+    +-- context_engine.py  Rich project context for the Reviewer agent
     +-- git_ops.py         Git repo detection, clean/dirty check, git init
     +-- shutdown.py        Graceful server shutdown manager
     +-- ui.py              Terminal display helpers (CLI mode)
@@ -224,7 +242,7 @@ Add `.ai-build/` to your target project's `.gitignore` to keep it out of version
 
 - **Quality depends on model size.** `gemma3:4b` is fast but sometimes produces diffs with incorrect line numbers. `gemma3:12b` or `qwen2.5-coder:7b` give significantly better results.
 - **Diffs sometimes need manual fixing.** The Reviewer and Refiner catch most issues, but on complex multi-file changes you may need to edit a diff by hand before approving.
-- **Context window limits.** Very large files may be truncated before being sent to Ollama. Each agent works with at most ~4 000 characters per file.
+- **Context window limits.** Very large files may be truncated before being sent to Ollama. Increase the context window in the sidebar Models panel or set `OLLAMA_NUM_CTX` in `.env`.
 - **No direct file writing.** ZeroToken never writes to your source files. Claude does that in the final step. This is intentional  you stay in control.
 - **Single-user, local-only.** The Flask server is not designed for multi-user or internet-facing deployment.
 - **Best results with gemma3:12b or larger.** For anything more complex than small utility functions, use a 12B+ parameter model.
@@ -276,4 +294,4 @@ Check that Flask installed correctly: `python -m flask --version`
 
 ## Licence
 
-[MIT](LICENSE) (c) 2026 13thrule
+[MIT](LICENSE)  2026 13thrule
