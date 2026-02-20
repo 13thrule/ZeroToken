@@ -12,6 +12,10 @@
 
 ---
 
+![ZeroToken infographic](screenshots/infographic.png)
+
+---
+
 ![ZeroToken start screen](screenshots/start%20screen.png)
 
 ---
