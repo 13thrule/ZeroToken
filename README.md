@@ -7,9 +7,8 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Mac%20%7C%20Linux-lightgrey)](#)
 
 > **The local-first agent builder that plans for free and executes for pennies.**
-
-ZeroToken uses Ollama to do all the expensive "thinking" on your own hardware  planning, patching, reviewing  then hands your existing AI tool (Claude, Gemini, GPT-4o) a single, compact execution prompt.
-Your code stays on your machine. Your API bill stays tiny.
+>
+> ZeroToken is a zero-fee agent orchestration system powered by [Ollama](https://ollama.com). It shifts the expensive "thinking" phase of AI development — planning, patching, reviewing — onto your own hardware, then generates a single high-context execution prompt you paste into whichever cloud LLM you already use. No subscriptions. No middleman. No data leaving your machine until you decide.
 
 ---
 
@@ -17,43 +16,56 @@ Your code stays on your machine. Your API bill stays tiny.
 
 ---
 
-## The philosophy
+## 🚀 The ZeroToken Philosophy
 
-Cloud AI agents are expensive because every mistake, file-search, and retry burns your credits.
-ZeroToken flips that:
+Traditional AI agents are expensive because they **think in the cloud**. Every mistake, file-search, and retry burns your API credits.
 
-| Phase | Who does it | Cost |
+ZeroToken flips the script — all the thinking is free:
+
+| Phase | Runs on | Cost |
 |---|---|---|
-| Read your codebase, generate a plan | Ollama (local) | **$0** |
-| Write unified diffs for each step | Ollama (local) | **$0** |
-| Review diffs for bugs and bad line numbers | Ollama (local) | **$0** |
-| Apply everything cleanly to your files | You paste one prompt into Claude/Gemini | ~$0.010.05 |
+| **Planner** — reads your codebase, writes a numbered plan | Your machine (Ollama) | **$0** |
+| **Patcher** — writes a precise unified diff per step | Your machine (Ollama) | **$0** |
+| **Reviewer** — checks for syntax errors and logic bugs | Your machine (Ollama) | **$0** |
+| **Refiner** — rewrites a rejected diff using review feedback | Your machine (Ollama) | **$0** |
+| **Execution** — you paste one assembled prompt into your LLM | Cloud (your choice) | ~$0.01–$0.05 |
 
-You stay in control at every step. Nothing is applied automatically  you review and approve each patch before it goes anywhere.
+You review and approve each diff before anything leaves your machine. Nothing is applied to your files automatically.
 
-> **Honest caveat:** output quality depends heavily on your local model. `gemma3:4b` is fast but makes mistakes. `gemma3:12b` or `qwen2.5-coder:7b` are significantly better. A GPU with 12 GB+ VRAM is recommended for comfortable use.
+> **Honest note:** output quality depends heavily on your local model. `gemma3:4b` is fast but makes mistakes on complex diffs. `gemma3:12b` or `qwen2.5-coder:7b` are significantly better. A GPU with 12 GB+ VRAM is recommended for the 12B models.
+
+---
+
+## 🛠️ Key Features
+
+- **Zero service fees** — no subscriptions, no pro tiers, no middleman markup
+- **Context tax killer** — stop sending your entire codebase to the cloud; ZeroToken generates compact unified diffs
+- **Privacy-first** — your project structure and drafts never leave your machine until you choose to send them
+- **Bring your own LLM** — works with Claude, Gemini, or any model you already have access to (free tiers included)
+- **Human in the loop** — you review and approve every diff; nothing is written to your files automatically
+- **Per-agent model control** — assign a different Ollama model to each agent from the sidebar, no restart needed
 
 ---
 
 ## How it works
 
 ```
-PLAN       Ollama reads your file tree and writes a numbered step plan
+PLAN    Ollama reads your file tree and writes a numbered step plan
 
-PATCH      For each step, Ollama writes a unified diff  (or you paste one from Claude)
+PATCH   For each step, Ollama writes a unified diff (or you paste one from Claude)
 
-REVIEW     Ollama checks the diff: line numbers correct? scope right? logic sound?
-            Optionally: Ollama Refiner rewrites bad diffs automatically
+REVIEW  Ollama checks the diff: line numbers correct? scope right? logic sound?
+        Optionally: Ollama Refiner rewrites bad diffs automatically
 
-DELIVER    ZeroToken assembles all approved diffs into one Final Prompt
-            Paste it into claude.ai  Claude applies every change in one shot
+DELIVER ZeroToken assembles all approved diffs into one Final Prompt
+        Paste it into your LLM of choice — it applies every change in one shot
 ```
 
-**Step view  review, approve, or refine each patch before it goes anywhere:**
+**Step view — review, approve, or refine each patch before it goes anywhere:**
 
 ![Approve or refine prompt](screenshots/approve%20or%20refine%20prompt.png)
 
-**Final prompt  one assembled block ready to paste into Claude:**
+**Final prompt — one assembled block ready to paste into your LLM:**
 
 ![Final prompt output](screenshots/final%20prompt%20output.png)
 
@@ -65,8 +77,8 @@ DELIVER    ZeroToken assembles all approved diffs into one Final Prompt
 |---|---|
 | Python 3.11+ | Earlier versions untested |
 | [Ollama](https://ollama.com) | Running locally on port 11434 |
-| A pulled Ollama model | `gemma3:4b` (fast)  `gemma3:12b` (recommended)  `qwen2.5-coder:7b` |
-| Claude / Gemini (optional) | Free browser tier works  no API key needed |
+| A pulled Ollama model | `gemma3:4b` (fast), `gemma3:12b` (recommended), `qwen2.5-coder:7b` |
+| Claude / Gemini (optional) | Free browser tier works — no API key needed |
 
 ---
 
@@ -104,7 +116,7 @@ python ai_build.py gui
 
 ## Changing models
 
-Use the **Models** panel in the sidebar to set a different Ollama model for each agent (Planner, Patcher, Reviewer, Refiner) independently, and adjust the context window (`num_ctx`) on the fly  no restart needed.
+Use the **Models** panel in the sidebar to set a different Ollama model for each agent (Planner, Patcher, Reviewer, Refiner) independently, and adjust the context window (`num_ctx`) on the fly — no restart needed.
 
 Or set defaults in `.env`:
 
@@ -117,38 +129,53 @@ Copy `.env.example` to `.env` to get started.
 
 ---
 
+## 📊 Cost Comparison (2026)
+
+| Phase | Cloud agents (Devin / Replit) | ZeroToken |
+|---|---|---|
+| Project planning | ~$0.20 | **$0.00** |
+| Diff generation | ~$0.50 | **$0.00** |
+| Code review | ~$0.30 | **$0.00** |
+| Refining / patching | ~$0.50 | **$0.00** |
+| **Total tool fee** | **~$1.50+** | **$0.00** |
+| Final execution pass | included in above | ~$0.01–$0.05 (your LLM) |
+
+*ZeroToken cost figures are accurate — Ollama runs locally and charges nothing. Final execution cost depends on which cloud model you use and how large your assembled prompt is. Free-tier Claude and Gemini work fine for most tasks.*
+
+---
+
 ## Pipeline diagram
 
 ```
-Goal (text)
-    |
-    v
-+----------+
-| Planner  |  Reads your file tree -> writes a numbered JSON plan
-+----------+
-    |  plan.json
-    v
-+----------+
-| Patcher  |  For each step: reads relevant files -> writes a unified diff
-+----------+
-    |  step-N.diff
-    v
-+----------+
-| Reviewer |  Checks the diff: line numbers correct? scope respected? logic sound?
-+----------+
-    |  verdict: approve / concerns / reject
-    v
-+----------+
-| Refiner  |  (optional) Re-reads the file + review feedback -> improved diff
-+----------+
-    |  step-N-refined.diff
-    v
-+----------+
-|Assembler |  Combines all approved diffs into one structured Final Prompt
-+----------+
-    |  final_prompt.txt
-    v
-  claude.ai -> Claude applies every change to your codebase
+Your goal (text)
+    │
+    ▼
+┌──────────┐
+│ Planner  │  Reads your file tree → writes a numbered JSON plan
+└──────────┘
+    │ plan.json
+    ▼
+┌──────────┐
+│ Patcher  │  Per step: reads relevant files → writes a unified diff
+└──────────┘
+    │ step-N.diff
+    ▼
+┌──────────┐
+│ Reviewer │  Checks the diff: line numbers correct? scope respected?
+└──────────┘
+    │ verdict: approve / concerns / reject
+    ▼
+┌──────────┐
+│ Refiner  │  (optional) Re-reads file + feedback → improved diff
+└──────────┘
+    │ step-N-refined.diff
+    ▼
+┌──────────┐
+│ Assembler│  Combines all approved diffs → one Final Prompt
+└──────────┘
+    │ final_prompt.txt
+    ▼
+  Claude / Gemini / GPT  →  applies every change to your codebase
 ```
 
 ---
@@ -200,8 +227,8 @@ Add `.ai-build/` to your project's `.gitignore`.
 ## Known limitations
 
 - **Model quality matters a lot.** `gemma3:4b` frequently produces diffs with wrong line numbers. Use `gemma3:12b` or larger for anything non-trivial.
-- **Diffs sometimes need manual fixes.** The Reviewer and Refiner catch most issues but are not perfect  especially on large multi-file changes.
-- **No direct file writing.** ZeroToken never touches your source files. Claude does that in the final step. This is intentional.
+- **Diffs sometimes need manual fixes.** The Reviewer and Refiner catch most issues but are not perfect — especially on large multi-file changes.
+- **No direct file writing.** ZeroToken never touches your source files. That happens in the final cloud step — intentionally.
 - **Single-user, local only.** The Flask server is not designed for multi-user or internet-facing deployment.
 - **Large files get excerpted.** The Patcher sends only the most relevant section of large files to Ollama. The `@@` line numbers are calculated against the full file, but this can occasionally be off.
 
@@ -239,21 +266,23 @@ python ai_build.py reset [step_id]    # reset one step (or all) to pending
 Run `ollama serve` in a terminal.
 
 **"The pasted text doesn't look like a unified diff"**
-Copy Claude's full reply  a valid diff starts with `---`/`+++` and contains `@@` markers.
+Copy the LLM's full reply — a valid diff starts with `---`/`+++` and contains `@@` markers.
 
 **"The pasted text is not valid JSON"**
-During planning, copy the full JSON reply (starts with `{`, ends with `}`).
+Copy the full JSON reply (starts with `{`, ends with `}`).
 
 **"No approved steps to assemble"**
 Approve at least one step before clicking Assemble.
 
 **Blank page or 500 error**
-Check Flask installed: `python -m flask --version`
+Check Flask is installed: `python -m flask --version`
 
 ---
-
-Built with ❤️ for the local LLM community.
 
 ## Licence
 
 [MIT](LICENSE) © 2026 13thrule
+
+---
+
+Built with ❤️ for the local LLM community.
