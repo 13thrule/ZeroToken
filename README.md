@@ -196,6 +196,62 @@ Goal (text)
 
 ---
 
+## Cost Analysis: ZeroToken vs. Industry Standards (2026)
+
+### 1. Cost Comparison
+
+| Tool Category | Example | Monthly Fixed Cost | Variable Cost (Tokens) | Data Privacy |
+|---|---|---|---|---|
+| **Local-First Agent** | **ZeroToken** | **$0 (Ollama)** | **Low (final pass only)** | **High** |
+| IDE-Integrated AI | Cursor / Copilot | $20 – $50 | Included (w/ limits) | Medium |
+| Cloud-Agentic | Devin / Replit Agent | $15 – $50 | High (usage-based) | Low |
+| Raw API Chat | Claude.ai / GPT-4o | $20 | Medium (manual copy/paste) | Medium |
+
+### 2. Token Consumption Breakdown
+
+For a representative task ("Build a Pendulum Screensaver"):
+
+**ZeroToken**
+- Planning: 0 tokens — local Ollama
+- Reviewing: 0 tokens — local Ollama
+- Execution: ~2,000 tokens — single final prompt to Claude/Gemini
+- **Estimated cost: ~$0.02**
+
+**Cloud IDE (Cursor / Copilot)**
+- Continuous background sync of file context to the cloud
+- Each "Apply" or "Chat" sends full file contents back and forth
+- Multiple drafting attempts waste tokens on reasoning through errors
+- **Effective cost: counted against the $20 subscription; hits slow/limited tier quickly**
+
+**Full Cloud Agent (Devin / Replit Agent)**
+- Runs in a cloud sandbox; searches, tests, and retries autonomously
+- Typically consumes 20k – 50k tokens per complex task
+- **Estimated cost: $0.50 – $2.00 per task**
+
+### 3. Hidden Costs
+
+**Context decay** — In cloud-first tools, growing projects require sending more context (and paying for it) with every request. ZeroToken indexes locally via Ollama; only the final diff payload reaches the cloud API.
+
+**Hallucination tax** — When a cloud model invents a library or gets physics math wrong, you pay for the mistake and the correction. ZeroToken's local Reviewer catches these before any cloud call is made.
+
+### 4. Hardware ROI
+
+| Item | Detail |
+|---|---|
+| Minimum GPU | 12 GB VRAM (e.g. RTX 4070, M2/M3 Mac) |
+| Break-even | ~12 months for a developer spending $100/month on AI subscriptions |
+| Mechanism | Shifts ~90% of AI "thinking" to local compute |
+
+### 5. When to Use What
+
+| Scenario | Recommendation |
+|---|---|
+| Power user, privacy-conscious, cost-sensitive | **ZeroToken** |
+| Prefer zero-setup, okay with subscription | Cloud IDE (Cursor / Copilot) |
+| Non-technical, need fully hands-off automation | Cloud Agent (Devin / Replit Agent) |
+
+---
+
 ## File structure
 
 ```
