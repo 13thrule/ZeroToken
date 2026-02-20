@@ -21,6 +21,10 @@ You are a senior software engineer. Output ONLY a JSON object — no prose, no m
 
 GOAL: {goal}
 
+⚠ CRITICAL: Your plan must implement EXACTLY the goal above and nothing else.
+Do NOT implement a snake game, calculator, todo list, or any other default example.
+Every step title, description, and file must be specific to: {goal}
+
 PROJECT FILE TREE:
 {file_tree}
 
@@ -59,6 +63,10 @@ _PLAN_PROMPT_BARE = """\
 You are a senior software engineer. Output ONLY a JSON object — no prose, no markdown.
 
 GOAL: {goal}
+
+⚠ CRITICAL: Your plan must implement EXACTLY the goal above and nothing else.
+Do NOT implement a snake game, calculator, todo list, or any other default example.
+Every step title, description, and file must be specific to: {goal}
 
 REQUIRED OUTPUT — return this JSON object and nothing else:
 {{
