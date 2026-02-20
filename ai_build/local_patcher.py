@@ -64,32 +64,111 @@ def _patcher_context(step: dict, root: str, prior_diffs: dict | None = None) -> 
             parts.append(prior_block)
             remaining -= len(prior_block)
 
-    # 3. Read each suggested file at full length within the remaining budget
-    #    Pre-check existence so we can label new vs existing files for Ollama.
+    # 3. Read each suggested file, extracting only the relevant section for
+    #    large files so Ollama can write accurate @@ line numbers.
     for rel_path in step.get("suggested_files", []):
         if remaining < 500:
             parts.append("[context budget exhausted — remaining suggested files omitted]")
             break
         fpath = root_path / rel_path
-        file_exists = fpath.exists()
-        if file_exists:
-            existence_note = f"⚠ THIS FILE ALREADY EXISTS — write a diff that modifies it, not recreates it"
-            try:
-                content = fpath.read_text(encoding="utf-8", errors="replace")
-            except Exception:
-                parts.append(f"\n[Could not read {rel_path}]")
-                continue
-            file_budget = min(remaining - 300, 8_000)
-            if len(content) > file_budget:
-                content = content[:file_budget] + "\n...(truncated — file too large for context window)"
-            block = f"\n{'═' * 60}\nFILE: {rel_path}\n{existence_note}\n{'═' * 60}\n{content}"
+
+        if not fpath.exists():
+            block = f"\n{'═' * 60}\nFILE: {rel_path}\n{'═' * 60}\n[NEW FILE — does not exist yet. Use --- /dev/null in diff header.]"
+            parts.append(block)
+            remaining -= len(block)
+            continue
+
+        try:
+            content = fpath.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            parts.append(f"\n[Could not read {rel_path}]")
+            continue
+
+        total_lines = len(content.splitlines())
+
+        if total_lines <= 60:
+            # Small file — send whole thing
+            display = content
+            location_note = f"(full file — {total_lines} lines)"
         else:
-            existence_note = "NEW FILE — use --- /dev/null in your diff header"
-            block = f"\n{'═' * 60}\nFILE: {rel_path}\n{existence_note}\n{'═' * 60}\n[File does not exist yet — create it from scratch]"
+            # Large file — extract the section most relevant to this step
+            section, start_line = _extract_relevant_section(
+                content,
+                step.get("description", "") + " " + step.get("title", "")
+            )
+            display = section
+            section_lines = len(section.splitlines())
+            end_line = start_line + section_lines - 1
+            location_note = (
+                f"(EXCERPT lines {start_line}–{end_line} of {total_lines} total — "
+                f"write @@ headers relative to the FULL file line numbers)"
+            )
+
+        file_budget = min(remaining - 300, 8_000)
+        if len(display) > file_budget:
+            display = display[:file_budget] + "\n...(truncated)"
+
+        block = (
+            f"\n{'═' * 60}\n"
+            f"FILE: {rel_path} {location_note}\n"
+            f"{'═' * 60}\n"
+            f"{display}"
+        )
         parts.append(block)
         remaining -= len(block)
 
     return "\n".join(parts)
+
+
+def _extract_relevant_section(content: str, description: str, context_lines: int = 25) -> tuple[str, int]:
+    """
+    Find the most relevant section of a file for a given step description.
+
+    Returns (section_text, start_line) where start_line is the 1-based line
+    number where the section begins in the original file, so Ollama can write
+    correct @@ headers.
+
+    Strategy:
+    1. Score each line by how many words from the description appear near it
+    2. Find the highest-scoring line
+    3. Return that line plus context_lines above and below
+    4. If no good match, return the end of the file (where new code goes)
+    """
+    lines = content.splitlines()
+    total = len(lines)
+
+    if total <= context_lines * 2:
+        # File is small enough to send whole
+        return content, 1
+
+    # Extract keywords from description (ignore common words)
+    stopwords = {'a','an','the','and','or','in','on','to','of','for','with',
+                 'is','it','its','be','by','from','that','this','as','at','if'}
+    words = set(re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]{2,}\b', description.lower()))
+    keywords = words - stopwords
+
+    if not keywords:
+        # No useful keywords — return end of file (where new code usually goes)
+        start = max(0, total - context_lines * 2)
+        section = '\n'.join(lines[start:])
+        return section, start + 1
+
+    # Score each line by keyword proximity with decay
+    scores = [0] * total
+    for i, line in enumerate(lines):
+        line_lower = line.lower()
+        for kw in keywords:
+            if kw in line_lower:
+                for offset in range(-5, 6):
+                    idx = i + offset
+                    if 0 <= idx < total:
+                        scores[idx] += max(0, 5 - abs(offset))
+
+    best = scores.index(max(scores))
+    start = max(0, best - context_lines)
+    end = min(total, best + context_lines)
+    section = '\n'.join(lines[start:end])
+    return section, start + 1
 
 
 # ---------------------------------------------------------------------------
@@ -138,6 +217,8 @@ FILE EXISTENCE RULES (critical):
 - If a file is shown as NEW FILE in PROJECT CONTEXT above → use --- /dev/null
 - NEVER use @@ -0,0 for a file that already has content
 - Your context lines (space-prefixed) MUST match lines that literally exist in the file right now
+- If the file context shows "EXCERPT lines X–Y of Z total", the @@ start
+  numbers must use the FULL file line numbers shown (X–Y), not relative numbers
 
 SELF-CHECK — before outputting, verify every hunk:
 1. Count the hunk body lines yourself:
