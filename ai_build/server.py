@@ -56,6 +56,7 @@ _state: dict = {
     "patcher_model":  os.getenv("OLLAMA_MODEL", "gemma3:4b"),
     "reviewer_model": os.getenv("OLLAMA_MODEL", "gemma3:4b"),
     "refiner_model":  os.getenv("OLLAMA_MODEL", "gemma3:4b"),
+    "num_ctx":        int(os.getenv("OLLAMA_NUM_CTX", "32768")),
 }
 
 
@@ -273,7 +274,15 @@ def set_models():
     _state["patcher_model"]  = request.form.get("patcher_model",  _default).strip() or _default
     _state["reviewer_model"] = request.form.get("reviewer_model", _default).strip() or _default
     _state["refiner_model"]  = request.form.get("refiner_model",  _default).strip() or _default
-    _flash(f"✓ Models updated — Planner:{_state['planner_model']}  Patcher:{_state['patcher_model']}  Reviewer:{_state['reviewer_model']}  Refiner:{_state['refiner_model']}")
+    try:
+        num_ctx = int(request.form.get("num_ctx", _state["num_ctx"]))
+        if num_ctx < 512:
+            num_ctx = 512
+        _state["num_ctx"] = num_ctx
+        os.environ["OLLAMA_NUM_CTX"] = str(num_ctx)
+    except (ValueError, TypeError):
+        pass
+    _flash(f"✓ Models updated — Planner:{_state['planner_model']}  Patcher:{_state['patcher_model']}  Reviewer:{_state['reviewer_model']}  Refiner:{_state['refiner_model']}  ctx:{_state['num_ctx']}")
     return redirect(url_for("index"))
 
 
@@ -303,6 +312,7 @@ def poll_status():
         "patcher_model":  _state.get("patcher_model",  _default),
         "reviewer_model": _state.get("reviewer_model", _default),
         "refiner_model":  _state.get("refiner_model",  _default),
+        "num_ctx":        _state.get("num_ctx", 32768),
     })
 
 
@@ -1156,7 +1166,13 @@ label.field-label{display:block;font-size:10px;font-weight:700;letter-spacing:.8
           </select>
         </div>
         {% endfor %}
-        <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;font-size:10px;margin-top:2px;">Apply</button>
+        <div class="ms-row" style="margin-top:4px;">
+          <label class="ms-label" title="Ollama num_ctx — tokens kept in KV cache. Higher = more context but more VRAM.">Context&nbsp;tokens</label>
+          <input type="number" name="num_ctx" min="512" max="131072" step="512"
+            value="{{ state.num_ctx }}"
+            style="width:90px;font-size:10px;padding:3px 5px;background:var(--bg3);color:var(--text1);border:1px solid var(--border);border-radius:3px;">
+        </div>
+        <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;font-size:10px;margin-top:4px;">Apply</button>
       </form>
     </details>
 
