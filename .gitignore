@@ -1,0 +1,74 @@
+# ── Environment & secrets ─────────────────────────────────────────────────────
+.env
+_env
+*.env
+.env.local
+.env.production
+.env.development
+
+# ── ZeroToken / ai-build runtime state ───────────────────────────────────────
+.ai-build/
+
+# ── Generated prompts & diffs in project root ─────────────────────────────────
+*.diff
+ollama_patch_step_*.txt
+patch_prompt_step_*.txt
+plan_prompt.txt
+final_prompt.txt
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+*.xml
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+
+# ── Build & packaging ────────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+
+# ── OS artefacts ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor ───────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Claude Code local settings ───────────────────────────────────────────────
+.claude/
+
+# ── Temporary Ollama workspace dirs ──────────────────────────────────────────
+tmpclaude*/
+
+# ── Old / archived versions ───────────────────────────────────────────────────
+version_one/
+
+# ── Root-level duplicate agent files (old copies, real files are in ai_build/) ─
+/assembler.py
+/local_patcher.py
+/local_planner.py
+/refiner.py
+/reviewer.py
+/server.py

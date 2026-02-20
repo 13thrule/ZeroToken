@@ -1,0 +1,4 @@
+﻿# ZeroToken requirements
+flask>=3.0          # web GUI
+# All other functionality uses Python standard library only.
+# (Ollama is called via urllib which is built into Python)
