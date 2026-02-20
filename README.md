@@ -18,6 +18,11 @@ You stay in control at every step. Nothing is applied automatically; you review 
 
 ---
 
+<!-- Screenshot: drop a PNG of the app here
+     e.g.: ![ZeroToken UI](docs/screenshot.png) -->
+
+---
+
 ## Why does it exist?
 
 Writing code with AI assistants works well for small self-contained tasks. It breaks down when the goal is large and multi-step  the AI loses context, makes conflicting edits, and you lose track of what changed.
@@ -192,7 +197,6 @@ ZeroToken/
     +-- assembler.py       Combines approved diffs into Final Agent Prompt
     +-- storage.py         Reads/writes plan.json, patches, prompts
     +-- context.py         Tech stack detection and file tree builder
-    +-- context_engine.py  Richer project context for prompts
     +-- git_ops.py         Git repo detection, clean/dirty check, git init
     +-- shutdown.py        Graceful server shutdown manager
     +-- ui.py              Terminal display helpers (CLI mode)
