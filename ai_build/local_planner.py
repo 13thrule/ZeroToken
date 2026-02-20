@@ -46,12 +46,12 @@ RULES:
 - Do NOT add tests, docs, or CI unless the goal explicitly requires them
 - Each acceptance_criteria item MUST be SHORT and TESTABLE — something you
   can verify by reading the file. Write what will literally appear in the code.
-  GOOD: "import logging appears at top of main.py"
-  GOOD: "class Snake has a self.length attribute set to 3"
-  GOOD: "function move() updates self.x when direction is 'right'"
+  GOOD: "import logging appears at top of server.py"
+  GOOD: "function save_user() writes a row to the database"
+  GOOD: "route /api/items returns a JSON list"
   BAD:  "the code works"
-  BAD:  "logging is added"
-  BAD:  "snake moves correctly"
+  BAD:  "feature is added"
+  BAD:  "it runs correctly"
 """
 
 # Fallback: used when model still fails with tree context
@@ -80,9 +80,9 @@ RULES:
 - Dependency order: no step may depend on a later step
 - Each acceptance_criteria item MUST be SHORT and TESTABLE — something you
   can verify by reading the file. Write what will literally appear in the code.
-  GOOD: "import logging appears at top of main.py"
-  GOOD: "class Snake has a self.length attribute set to 3"
-  BAD:  "the code works" / "logging is added" / "snake moves correctly"
+  GOOD: "import logging appears at top of server.py"
+  GOOD: "function save_user() writes a row to the database"
+  BAD:  "the code works" / "feature is added" / "it runs correctly"
 """
 
 # ---------------------------------------------------------------------------
