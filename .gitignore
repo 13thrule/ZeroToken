@@ -45,6 +45,11 @@ build/
 *.egg
 MANIFEST
 
+# ── PyInstaller build artefacts ──────────────────────────────────────────────
+build/
+*.spec
+ZeroToken.exe
+
 # ── OS artefacts ─────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db

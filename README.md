@@ -128,13 +128,17 @@ ollama pull gemma3:12b        # better quality, recommended for complex codebase
 
 ## Launch ZeroToken
 
-**Option A  Windows GUI launcher (recommended)**
+**Option A — ZeroToken.exe (recommended, Windows)**
 
-Double-click `ZeroToken.bat` in the project folder.
+Double-click `ZeroToken.exe` in the project folder. A launcher window opens, starts the local server, streams the log, and automatically opens [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser once it is ready. No terminal needed.
 
-This opens a dark-themed launcher window where you can start/stop the server, watch the live log, and open the web UI  all in one place.
+> `ZeroToken.exe` is not included in the repo (binary). Build it once with:
+> ```
+> build_exe.bat
+> ```
+> This requires `.venv` to already exist (see Installation above). The exe is ~10 MB and goes in the project root.
 
-**Option B  command line**
+**Option B — command line (all platforms)**
 
 ```bash
 python ai_build.py gui
